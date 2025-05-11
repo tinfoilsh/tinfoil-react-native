@@ -1,5 +1,3 @@
-import ReactNative from './NativeReactNative';
+import ReactNative from './NativeTinfoil';
 
-export function multiply(a: number, b: number): number {
-  return ReactNative.multiply(a, b);
-}
+export default ReactNative;
