@@ -1,5 +1,5 @@
-#import <ReactNativeSpec/ReactNativeSpec.h>
+#import <Tinfoil/Tinfoil.h>
 
-@interface ReactNative : NSObject <NativeReactNativeSpec>
+@interface Tinfoil : NSObject <NativeTinfoilSpec>
 
 @end

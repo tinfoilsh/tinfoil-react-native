@@ -1,16 +1,21 @@
 import Foundation
-import TinfoilKit              // from the SPM package
-import OpenAIKit               // transitively included
+import TinfoilKit
+import OpenAIKit
+
+// Quick wrapper so arbitrary strings satisfy `ModelID`
+private struct AnyModel: ModelID {
+  let id: String
+}
 
 @objc(TinfoilBridge)           // give Obj-C something to see
-final class TinfoilBridge: NSObject {
+public final class TinfoilBridge: NSObject {
 
   private var client: TinfoilAI?
 
   // MARK: – Public API exposed to Obj-C
 
   @objc
-  func initialize(
+  public func initialize(
     _ apiKey: String?,
     githubRepo: String,
     enclaveURL: String,
@@ -31,7 +36,7 @@ final class TinfoilBridge: NSObject {
   }
 
   @objc
-  func chatCompletion(
+  public func chatCompletion(
     _ model: String,
     messages: [[String: Any]],
     completion: @escaping (String?, NSError?) -> Void
@@ -49,15 +54,32 @@ final class TinfoilBridge: NSObject {
       do {
         // convert dictionaries back to Chat.Message
         let swiftMsgs: [Chat.Message] = try messages.compactMap { dict in
-          guard let role = dict["role"] as? String,
-                let content = dict["content"] as? String
-          else { throw NSError(domain: "Tinfoil", code: 1) }
+          guard
+            let role   = dict["role"]    as? String,
+            let content = dict["content"] as? String
+          else {
+            throw NSError(
+              domain: "Tinfoil",
+              code:   1,
+              userInfo: [NSLocalizedDescriptionKey: "Invalid chat message"]
+            )
+          }
 
-          return Chat.Message(role: .init(rawValue: role), content: content)
+          switch role {
+          case "system":    return .system(content: content)
+          case "user":      return .user(content: content)
+          case "assistant": return .assistant(content: content)
+          default:
+            throw NSError(
+              domain: "Tinfoil",
+              code:   2,
+              userInfo: [NSLocalizedDescriptionKey: "Unknown role '\(role)'"]
+            )
+          }
         }
 
         let resp = try await client.client.chats.create(
-          model: model,
+          model: AnyModel(id: model),           // ← convert String → ModelID
           messages: swiftMsgs
         )
         completion(resp.choices.first?.message.content, nil)

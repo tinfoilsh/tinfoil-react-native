@@ -10,13 +10,17 @@ Pod::Spec.new do |s|
   s.license      = package["license"]
   s.authors      = package["author"]
 
-  s.platforms    = { :ios => min_ios_version_supported }
+  s.platforms    = { :ios => '17.0' }
   s.source       = { :git => "https://github.com/tinfoilsh/tinfoil-react-native.git", :tag => "#{s.version}" }
 
-  s.source_files = "ios/**/*.{h,m,mm,cpp}"
+  s.source_files = "ios/**/*.{h,m,mm,cpp,swift}"
   s.private_header_files = "ios/**/*.h"
+  s.swift_version = '5.9'
 
-  s.dependency 'TinfoilKit', '~> 0.0.2'
+  spm_dependency s,
+    url: 'https://github.com/tinfoilsh/tinfoil-swift.git',
+    requirement: { kind: 'upToNextMajorVersion', minimumVersion: '0.0.2' },
+    products: ['TinfoilKit']
 
  install_modules_dependencies(s)
 end

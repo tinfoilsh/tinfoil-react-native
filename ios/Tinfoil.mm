@@ -1,5 +1,5 @@
 #import "Tinfoil.h"
-#import "tinfoil-react-native-Swift.h" // auto-generated Swift-to-ObjC header
+#import <ReactNative/ReactNative-Swift.h> // auto-generated Swift-to-ObjC header
 
 @implementation Tinfoil
 RCT_EXPORT_MODULE() // mandatory macro
