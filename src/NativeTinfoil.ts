@@ -14,7 +14,7 @@ export interface ChatMessage {
 
 export interface Spec extends TurboModule {
   /** Must be called once before any other method */
-  initialize(config: InitConfig): void;
+  initialize(config: InitConfig): Promise<void>;
 
   /** Simple example that returns only the assistant’s text */
   chatCompletion(model: string, messages: ChatMessage[]): Promise<string>;
