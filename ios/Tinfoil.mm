@@ -1,5 +1,5 @@
 #import "Tinfoil.h"
-#import <ReactNative/ReactNative-Swift.h> // auto-generated Swift-to-ObjC header
+#import <Tinfoil/Tinfoil-Swift.h> // auto-generated Swift-to-ObjC header
 
 @implementation Tinfoil {
   TinfoilBridge *_bridge;          // <— keep one Swift object

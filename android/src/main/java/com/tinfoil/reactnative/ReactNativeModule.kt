@@ -18,6 +18,6 @@ class ReactNativeModule(reactContext: ReactApplicationContext) :
   }
 
   companion object {
-    const val NAME = "ReactNative"
+    const val NAME = "Tinfoil"
   }
 }
