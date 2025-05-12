@@ -1,4 +1,4 @@
-# @tinfoil/react-native
+# tinfoil-react-native
 
 > Official Tinfoil secure OpenAI client wrapper for React Native
 
@@ -6,8 +6,14 @@
 
 ## Installation
 
+If you're using this library in your app:
 ```sh
-npm install @tinfoil/react-native
+npm install tinfoil-react-native
+```
+
+If you're developing the library itself:
+```sh
+npm install
 ```
 
 ### iOS
@@ -17,10 +23,16 @@ If you're using this library in your app:
 cd ios && pod install  # in YOUR app's ios folder
 ```
 
-If you're developing the library itself:
+If you're developing the library itself and want to build the example app:
+```sh
+npm run start --workspace=tinfoil-react-native-example
+```
+Then in a separate terminal:
 ```sh
 cd example/ios && pod install  # in the example app's ios folder
+open ReactNativeExample.xcodeproj
 ```
+And then build using Xcode tool.
 
 Note: Make sure you have CocoaPods installed (`sudo gem install cocoapods`).
 
@@ -31,7 +43,7 @@ Note: Make sure you have CocoaPods installed (`sudo gem install cocoapods`).
 ### 1. Initialize the SDK
 
 ```ts
-import Tinfoil from '@tinfoil/react-native';
+import Tinfoil from 'tinfoil-react-native';
 
 await Tinfoil.initialize({
   apiKey: 'YOUR_API_KEY',
@@ -52,7 +64,7 @@ console.log('Assistant:', reply);
 ### 3. Secure Verification with Progress Callbacks
 
 ```ts
-import type { VerificationStatus, VerificationResult } from '@tinfoil/react-native';
+import type { VerificationStatus, VerificationResult } from 'tinfoil-react-native';
 
 const verificationResult: VerificationResult = await Tinfoil.verify(
   (codeStatus: VerificationStatus) => {
