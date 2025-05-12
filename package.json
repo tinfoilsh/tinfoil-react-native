@@ -15,17 +15,11 @@
   "files": [
     "src",
     "lib",
-    "android",
     "ios",
     "cpp",
     "*.podspec",
     "react-native.config.js",
     "!ios/build",
-    "!android/build",
-    "!android/gradle",
-    "!android/gradlew",
-    "!android/gradlew.bat",
-    "!android/local.properties",
     "!**/__tests__",
     "!**/__fixtures__",
     "!**/__mocks__",
@@ -42,8 +36,7 @@
   },
   "keywords": [
     "react-native",
-    "ios",
-    "android"
+    "ios"
   ],
   "repository": {
     "type": "git",
@@ -154,10 +147,7 @@
   "codegenConfig": {
     "name": "Tinfoil",
     "type": "modules",
-    "jsSrcsDir": "./src",
-    "android": {
-      "javaPackageName": "com.tinfoil.reactnative"
-    }
+    "jsSrcsDir": "./src"
   },
   "create-react-native-library": {
     "languages": "kotlin-objc",
