@@ -150,7 +150,7 @@
     "jsSrcsDir": "./src"
   },
   "create-react-native-library": {
-    "languages": "kotlin-objc",
+    "languages": "objc",
     "type": "turbo-module",
     "version": "0.50.2"
   }
