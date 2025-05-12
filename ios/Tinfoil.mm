@@ -53,6 +53,28 @@ RCT_EXPORT_MODULE() // mandatory macro
   }];
 }
 
+- (void)verify:(RCTResponseSenderBlock)onCodeVerificationComplete
+onRuntimeVerificationComplete:(RCTResponseSenderBlock)onRuntimeVerificationComplete
+onSecurityCheckComplete:(RCTResponseSenderBlock)onSecurityCheckComplete
+       resolve:(RCTPromiseResolveBlock)resolve
+        reject:(RCTPromiseRejectBlock)reject
+{
+  [_bridge verifyOnCodeVerificationComplete:onCodeVerificationComplete
+                  onRuntimeVerificationComplete:onRuntimeVerificationComplete
+                  onSecurityCheckComplete:onSecurityCheckComplete
+                                   completion:^(NSDictionary * _Nullable result,
+                                                NSError      * _Nullable error)
+  {
+    if (error) {
+      reject([NSString stringWithFormat:@"%ld", (long)error.code],
+             error.localizedDescription,
+             error);
+    } else {
+      resolve(result ?: @{});
+    }
+  }];
+}
+
 #pragma mark - TurboModule boiler-plate
 
 - (std::shared_ptr<facebook::react::TurboModule>)

@@ -1,3 +1,7 @@
-import ReactNative from './NativeTinfoil';
+import Tinfoil from './NativeTinfoil';
 
-export default ReactNative;
+// Re-export all the useful TypeScript types and helpers.
+export * from './NativeTinfoil';
+
+// Keep the default export unchanged.
+export default Tinfoil;
