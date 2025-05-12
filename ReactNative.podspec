@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
 
   spm_dependency s,
     url: 'https://github.com/tinfoilsh/tinfoil-swift.git',
-    requirement: { kind: 'upToNextMajorVersion', minimumVersion: '0.0.2' },
+    requirement: { kind: 'branch', branch: 'jules-dev' },
     products: ['TinfoilKit']
 
  install_modules_dependencies(s)

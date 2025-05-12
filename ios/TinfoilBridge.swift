@@ -79,7 +79,7 @@ public final class TinfoilBridge: NSObject {
         }
 
         let resp = try await client.client.chats.create(
-          model: AnyModel(id: model),           // ← convert String → ModelID
+          model: AnyModel(id: model),
           messages: swiftMsgs
         )
         completion(resp.choices.first?.message.content, nil)
