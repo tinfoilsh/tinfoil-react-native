@@ -1,5 +1,7 @@
-import ReactNative from './NativeReactNative';
+import Tinfoil from './NativeTinfoil';
 
-export function multiply(a: number, b: number): number {
-  return ReactNative.multiply(a, b);
-}
+// Re-export all the useful TypeScript types and helpers.
+export * from './NativeTinfoil';
+
+// Keep the default export unchanged.
+export default Tinfoil;

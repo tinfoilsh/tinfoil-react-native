@@ -70,10 +70,13 @@
     "@release-it/conventional-changelog": "^9.0.2",
     "@types/jest": "^29.5.5",
     "@types/react": "^19.0.0",
+    "@typescript-eslint/eslint-plugin": "latest",
+    "@typescript-eslint/parser": "latest",
     "commitlint": "^19.6.1",
     "del-cli": "^5.1.0",
     "eslint": "^9.22.0",
     "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-jest": "^28.11.0",
     "eslint-plugin-prettier": "^5.2.3",
     "jest": "^29.7.0",
     "prettier": "^3.0.3",
@@ -149,9 +152,9 @@
     ]
   },
   "codegenConfig": {
-    "name": "ReactNativeSpec",
+    "name": "Tinfoil",
     "type": "modules",
-    "jsSrcsDir": "src",
+    "jsSrcsDir": "./src",
     "android": {
       "javaPackageName": "com.tinfoil.reactnative"
     }
