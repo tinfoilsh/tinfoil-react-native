@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
-import Tinfoil from '@tinfoil/react-native';
+import Tinfoil from 'tinfoil-react-native';
 import type {
   VerificationStatus,
   VerificationResult,
-} from '@tinfoil/react-native';
+} from 'tinfoil-react-native';
 
 export default function App() {
   const [answer, setAnswer] = useState<string>('Waiting…');

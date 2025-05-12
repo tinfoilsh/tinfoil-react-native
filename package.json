@@ -1,5 +1,5 @@
 {
-  "name": "@tinfoil/react-native",
+  "name": "tinfoil-react-native",
   "version": "0.1.0",
   "description": "Official Tinfoil secure OpenAI client wrapper for react native",
   "main": "./lib/module/index.js",
@@ -26,7 +26,7 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "yarn workspace @tinfoil/react-native-example",
+    "example": "yarn workspace tinfoil-react-native-example",
     "test": "jest",
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
