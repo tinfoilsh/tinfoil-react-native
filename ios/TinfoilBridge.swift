@@ -148,13 +148,25 @@ public final class TinfoilBridge: NSObject {
   // MARK: – Helpers -----------------------------------------------------------
 
   private static func progressDict(from anyResult: Any) -> [String: Any] {
-    // Very defensive: if we can't down-cast, just stringify.
-    if
-      let result = anyResult as? CustomStringConvertible
-    {
-      return ["result": result.description]
+    // If we got TinfoilKit.StepResult – turn it into a JS-friendly dictionary.
+    if let step = anyResult as? StepResult {
+      switch step.status {
+      case .success:
+        return ["status": "success",
+                "digest": step.digest as Any]      // digest is on the struct
+      case .failure(let error):
+        return ["status": "failure",
+                "error":  error.localizedDescription]
+      case .pending:
+        return ["status": "pending"]
+      case .inProgress:
+        return ["status": "inProgress"]
+      }
     }
-    return ["result": String(describing: anyResult)]
+
+    // Fallback for unexpected types – stringify so the bridge never crashes.
+    return ["status": "failure",
+            "error": String(describing: anyResult)]
   }
 
   private static func resultDict(from res: Any) -> [String: Any] {
