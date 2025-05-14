@@ -40,7 +40,15 @@ npm run start --workspace=tinfoil-react-native-example
 Then in a separate terminal:
 ```sh
 cd example/ios && pod install  # in the example app's ios folder
+```
+Then to build and run the app use
+```sh
 open ReactNativeExample.xcodeproj
+```
+Or
+```sh
+cd ..  # go back to example directory
+npx react-native run-ios
 ```
 
 Note: Make sure you have CocoaPods installed (`sudo gem install cocoapods`).
