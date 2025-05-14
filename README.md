@@ -6,39 +6,50 @@
 
 ## Installation
 
-If you're using this library in your app:
+To use this library in your app, first install the package:
 ```sh
 npm install tinfoil-react-native
 ```
 
-If you're developing the library itself:
-```sh
-npm install
-```
-
 ### iOS
+You will then need to add these flags in your app's ```ios/Podfile``` file:
+```ruby
+ENV['RCT_NEW_ARCH_ENABLED'] = '1'
+ENV['USE_FRAMEWORKS'] = 'dynamic'
+```
 
 If you're using this library in your app:
 ```sh
 cd ios && pod install  # in YOUR app's ios folder
 ```
 
+And then build using your favorite Expo, npm or Xcode tool.
+
+---
+## Development
+If you're developing the library itself:
+```sh
+npm install
+```
+
 If you're developing the library itself and want to build the example app:
 ```sh
 npm run start --workspace=tinfoil-react-native-example
 ```
+
 Then in a separate terminal:
 ```sh
 cd example/ios && pod install  # in the example app's ios folder
 open ReactNativeExample.xcodeproj
 ```
-And then build using Xcode tool.
 
 Note: Make sure you have CocoaPods installed (`sudo gem install cocoapods`).
 
 ---
 
 ## Usage
+
+To get an API Key, sign up on [Tinfoil](tinfoil.sh) and get an API key from your account dashboard.
 
 ### 1. Initialize the SDK
 
