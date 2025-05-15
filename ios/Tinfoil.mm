@@ -53,6 +53,21 @@ RCT_EXPORT_MODULE() // mandatory macro
   }];
 }
 
+- (void)chatCompletionStream:(NSString *)model
+                    messages:(NSArray *)messages
+                     onOpen:(RCTResponseSenderBlock)onOpen
+                    onChunk:(RCTResponseSenderBlock)onChunk
+                     onDone:(RCTResponseSenderBlock)onDone
+                    onError:(RCTResponseSenderBlock)onError
+{
+  [_bridge chatCompletionStream:model
+                       messages:messages
+                         onOpen:onOpen
+                        onChunk:onChunk
+                         onDone:onDone
+                        onError:onError];
+}
+
 - (void)verify:(RCTResponseSenderBlock)onCodeVerificationComplete
 onRuntimeVerificationComplete:(RCTResponseSenderBlock)onRuntimeVerificationComplete
 onSecurityCheckComplete:(RCTResponseSenderBlock)onSecurityCheckComplete
