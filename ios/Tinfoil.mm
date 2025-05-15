@@ -5,7 +5,7 @@
   TinfoilBridge *_bridge;          // <— keep one Swift object
 }
 
-RCT_EXPORT_MODULE() // mandatory macro
+RCT_EXPORT_MODULE(Tinfoil) // mandatory macro
 
 - (instancetype)init
 {
@@ -75,6 +75,7 @@ onSecurityCheckComplete:(RCTResponseSenderBlock)onSecurityCheckComplete
   }];
 }
 
+#if RCT_NEW_ARCH_ENABLED
 #pragma mark - TurboModule boiler-plate
 
 - (std::shared_ptr<facebook::react::TurboModule>)
@@ -82,4 +83,5 @@ onSecurityCheckComplete:(RCTResponseSenderBlock)onSecurityCheckComplete
 {
   return std::make_shared<facebook::react::NativeTinfoilSpecJSI>(params);
 }
+#endif
 @end

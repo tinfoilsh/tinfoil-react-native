@@ -43,7 +43,7 @@ cd example/ios && pod install  # in the example app's ios folder
 ```
 Then to build and run the app use
 ```sh
-open ReactNativeExample.xcodeproj
+open ReactNativeExample.xcworkspace
 ```
 Or
 ```sh
