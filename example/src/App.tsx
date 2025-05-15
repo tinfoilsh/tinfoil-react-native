@@ -53,11 +53,30 @@ export default function App() {
         initialized.current = true;
       }
 
-      setReply('…'); // placeholder while waiting
-      const text = await Tinfoil.chatCompletion('llama3-3-70b', [
-        { role: 'user', content: prompt },
-      ]);
-      setReply(text);
+      setReply(''); // Start with empty reply for streaming
+
+      // Use streaming API instead of regular completion
+      Tinfoil.chatCompletionStream(
+        'llama3-3-70b',
+        [{ role: 'user', content: prompt }],
+        () => {
+          // onOpen - stream connection established
+          // No action needed here, or could show "Streaming..."
+        },
+        (delta) => {
+          // onChunk - append each chunk to the reply
+          setReply((prev) => (prev || '') + delta);
+        },
+        () => {
+          // onDone - stream completed successfully
+          // No action needed here, all text is already in the reply
+        },
+        (error) => {
+          // onError - handle streaming errors
+          console.error(error);
+          setReply(`Error: ${error}`);
+        }
+      );
     } catch (err) {
       console.error(err);
       setReply(String(err));
