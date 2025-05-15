@@ -44,6 +44,16 @@ export interface Spec extends TurboModule {
   /** Simple example that returns only the assistant's text */
   chatCompletion(model: string, messages: ChatMessage[]): Promise<string>;
 
+  /** Streaming completion – returns immediately, pushes data via callbacks */
+  chatCompletionStream(
+    model: string,
+    messages: ChatMessage[],
+    onOpen: () => void,
+    onChunk: (delta: string) => void,
+    onDone: () => void,
+    onError: (error: string) => void
+  ): void;
+
   /**
    * Perform secure code & runtime verification.
    *
