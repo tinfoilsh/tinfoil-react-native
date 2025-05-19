@@ -19,6 +19,13 @@ RCT_EXPORT_MODULE(Tinfoil)
   return self;
 }
 
+- (NSArray<NSString *> *)supportedEvents
+{
+  return @[@"TinfoilProgress"];   // one channel for all three phases
+}
+
++ (BOOL)requiresMainQueueSetup { return NO; }
+
 #if RCT_NEW_ARCH_ENABLED
 - (void)initialize:(JS::NativeTinfoil::InitConfig &)config
            resolve:(RCTPromiseResolveBlock)resolve
@@ -123,16 +130,21 @@ onSecurityCheckComplete:(RCTResponseSenderBlock)onSecurity
   }];
 }
 #else
-RCT_EXPORT_METHOD(verifyOldBridge:(RCTResponseSenderBlock)progress
-                      done:(RCTResponseSenderBlock)done)
+RCT_EXPORT_METHOD(verifyOldBridge:(RCTPromiseResolveBlock)resolve
+                       rejecter:(RCTPromiseRejectBlock)reject)
 {
-  [_bridge verifyOnCodeVerificationComplete:^(id p){ progress(@[p]); }
-                  onRuntimeVerificationComplete:^(id p){ progress(@[p]); }
-                  onSecurityCheckComplete:^(id p){ progress(@[p]); }
-                  completion:^(NSDictionary *res, NSError *err) {
-      if (err)  done(@[ @{@"error": err.localizedDescription} ]);
-      else      done(@[ res ?: @{} ]);
-  }];
+  [_bridge verifyOnCodeVerificationComplete:^(id p){
+        [self sendEventWithName:@"TinfoilProgress" body:p];
+      }
+      onRuntimeVerificationComplete:^(id p){
+        [self sendEventWithName:@"TinfoilProgress" body:p];
+      }
+      onSecurityCheckComplete:^(id p){
+        [self sendEventWithName:@"TinfoilProgress" body:p];
+      }
+      completion:^(NSDictionary *res, NSError *err) {
+        if (err) reject(@"verify_error", err.localizedDescription, err);
+        else     resolve(res ?: @{}); } ];
 }
 #endif
 
