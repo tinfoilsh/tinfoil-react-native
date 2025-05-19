@@ -130,17 +130,39 @@ onSecurityCheckComplete:(RCTResponseSenderBlock)onSecurity
   }];
 }
 #else
+static NSDictionary *wrap(NSString *phase, id payload)
+{
+  id candidate = payload;
+
+  // If the bridge gave us [ { … } ] take the first object.
+  if ([candidate isKindOfClass:[NSArray class]] &&
+      [(NSArray *)candidate count] > 0) {
+    candidate = [(NSArray *)candidate firstObject];
+  }
+
+  NSMutableDictionary *d = [NSMutableDictionary dictionary];
+
+  if ([candidate isKindOfClass:[NSDictionary class]]) {
+    [d addEntriesFromDictionary:(NSDictionary *)candidate];
+  } else if (candidate) {
+    d[@"status"] = candidate;   // fallback for strings, numbers, etc.
+  }
+
+  d[@"phase"] = phase;
+  return d;
+}
+
 RCT_EXPORT_METHOD(verifyOldBridge:(RCTPromiseResolveBlock)resolve
                        rejecter:(RCTPromiseRejectBlock)reject)
 {
   [_bridge verifyOnCodeVerificationComplete:^(id p){
-        [self sendEventWithName:@"TinfoilProgress" body:p];
+        [self sendEventWithName:@"TinfoilProgress" body:wrap(@"code",     p)];
       }
       onRuntimeVerificationComplete:^(id p){
-        [self sendEventWithName:@"TinfoilProgress" body:p];
+        [self sendEventWithName:@"TinfoilProgress" body:wrap(@"runtime",  p)];
       }
       onSecurityCheckComplete:^(id p){
-        [self sendEventWithName:@"TinfoilProgress" body:p];
+        [self sendEventWithName:@"TinfoilProgress" body:wrap(@"security", p)];
       }
       completion:^(NSDictionary *res, NSError *err) {
         if (err) reject(@"verify_error", err.localizedDescription, err);
