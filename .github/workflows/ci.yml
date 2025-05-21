@@ -52,9 +52,13 @@ jobs:
 
   build-ios:
     runs-on: macos-latest
+    strategy:
+      matrix:
+        rtc_new_arch: ['0', '1']
     env:
       XCODE_VERSION: 16.2
-      TURBO_CACHE_DIR: .turbo/ios
+      RCT_NEW_ARCH_ENABLED: ${{ matrix.rtc_new_arch }}
+      TURBO_CACHE_DIR: .turbo/ios-${{ matrix.rtc_new_arch }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -66,9 +70,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.TURBO_CACHE_DIR }}
-          key: ${{ runner.os }}-turborepo-ios-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-turborepo-ios-${{ matrix.rtc_new_arch }}-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-turborepo-ios-
+            ${{ runner.os }}-turborepo-ios-${{ matrix.rtc_new_arch }}-
 
       - name: Check turborepo cache for iOS
         run: |
@@ -91,9 +95,9 @@ jobs:
         with:
           path: |
             **/ios/Pods
-          key: ${{ runner.os }}-cocoapods-${{ hashFiles('example/ios/Podfile.lock') }}
+          key: ${{ runner.os }}-cocoapods-${{ matrix.rtc_new_arch }}-${{ hashFiles('example/ios/Podfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-cocoapods-
+            ${{ runner.os }}-cocoapods-${{ matrix.rtc_new_arch }}-
 
       - name: Install cocoapods
         if: env.turbo_cache_hit != 1 && steps.cocoapods-cache.outputs.cache-hit != 'true'

@@ -2258,12 +2258,12 @@ __metadata:
   linkType: hard
 
 "@modelcontextprotocol/sdk@npm:^1.8.0":
-  version: 1.11.2
-  resolution: "@modelcontextprotocol/sdk@npm:1.11.2"
+  version: 1.11.3
+  resolution: "@modelcontextprotocol/sdk@npm:1.11.3"
   dependencies:
     content-type: ^1.0.5
     cors: ^2.8.5
-    cross-spawn: ^7.0.3
+    cross-spawn: ^7.0.5
     eventsource: ^3.0.2
     express: ^5.0.1
     express-rate-limit: ^7.5.0
@@ -2271,7 +2271,7 @@ __metadata:
     raw-body: ^3.0.0
     zod: ^3.23.8
     zod-to-json-schema: ^3.24.1
-  checksum: e774e047b3b6452d691e45b95b302df83e6a9af5376c6553c34327147bcbec30475a74f9825fe9e9d414d22e2af1d7a383bda0ea25812bed0576202af20572d1
+  checksum: 5f53a9c3d76e89eac58f81397410dc3d06be2aee708df68dcfa94d6686ea5cb7a6bdb515a85f9c6433d3a909a53abff7454cbb7a40ba0afcb448000e6efa7c08
   languageName: node
   linkType: hard
 
@@ -3691,7 +3691,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"acorn@npm:^8.14.0, acorn@npm:^8.8.2":
+"acorn@npm:^8.14.0":
   version: 8.14.1
   resolution: "acorn@npm:8.14.1"
   bin:
@@ -5180,7 +5180,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cross-spawn@npm:^7.0.0, cross-spawn@npm:^7.0.3, cross-spawn@npm:^7.0.6":
+"cross-spawn@npm:^7.0.0, cross-spawn@npm:^7.0.3, cross-spawn@npm:^7.0.5, cross-spawn@npm:^7.0.6":
   version: 7.0.6
   resolution: "cross-spawn@npm:7.0.6"
   dependencies:
@@ -5552,9 +5552,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.149":
-  version: 1.5.153
-  resolution: "electron-to-chromium@npm:1.5.153"
-  checksum: 4116f7e149c3e39d81f6eebb231fe385044c0205f1d36f09ef4dc90a1db3561f5b4753ff801eb4aa9c6a892304494468aa33d3307fac8ffbb63e998d16e2de78
+  version: 1.5.155
+  resolution: "electron-to-chromium@npm:1.5.155"
+  checksum: 6e8f666d4ea0b70e1dd94e2ae588a4e38545beab1d9de7875e19a771f333549cf304fe6cbf19d773d7ac79dffae1c479b9d4291cf6f1523e5d24109ae79f610c
   languageName: node
   linkType: hard
 
@@ -12233,16 +12233,16 @@ __metadata:
   linkType: hard
 
 "terser@npm:^5.15.0":
-  version: 5.39.1
-  resolution: "terser@npm:5.39.1"
+  version: 5.39.2
+  resolution: "terser@npm:5.39.2"
   dependencies:
     "@jridgewell/source-map": ^0.3.3
-    acorn: ^8.8.2
+    acorn: ^8.14.0
     commander: ^2.20.0
     source-map-support: ~0.5.20
   bin:
     terser: bin/terser
-  checksum: e5b67c6e09631573ae2fd1601823c7338ab49d52e245f5e6564a26e1b81193a115e1847a53f0c690b33942029c628ccf4c8039bbfadbaa0b4ec1630f44a1b5d3
+  checksum: 986a47896503c5bc6475c751d9445d4326de2e6f8b0be2c943b7726426ad0fe2385aacb9dce1dbc3aee13171595a0234411479bc855e6c730a51f23175132c84
   languageName: node
   linkType: hard
 
@@ -13179,11 +13179,11 @@ __metadata:
   linkType: hard
 
 "yaml@npm:^2.2.1":
-  version: 2.7.1
-  resolution: "yaml@npm:2.7.1"
+  version: 2.8.0
+  resolution: "yaml@npm:2.8.0"
   bin:
     yaml: bin.mjs
-  checksum: 385f8115ddfafdf8e599813cca8b2bf4e3f6a01b919fff5ae7da277e164df684d7dfe558b4085172094792b5a04786d3c55fa8b74abb0ee029873f031150bb80
+  checksum: 66f103ca5a2f02dac0526895cc7ae7626d91aa8c43aad6fdcff15edf68b1199be4012140b390063877913441aaa5288fdf57eca30e06268a8282dd741525e626
   languageName: node
   linkType: hard
 
