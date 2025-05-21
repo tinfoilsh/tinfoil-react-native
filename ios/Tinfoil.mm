@@ -1,6 +1,6 @@
 #import "Tinfoil.h"
 #import <Tinfoil/Tinfoil-Swift.h> // auto-generated Swift-to-ObjC header
-
+#import <React/RCTBridge.h>
 #if RCT_NEW_ARCH_ENABLED
   #import <Tinfoil/Tinfoil.h>
 #endif
@@ -19,12 +19,24 @@ RCT_EXPORT_MODULE(Tinfoil)
   return self;
 }
 
-- (NSArray<NSString *> *)supportedEvents
++ (BOOL)requiresMainQueueSetup { return NO; }
+
+// Forward the bridge once RN sets it so the Swift emitter can emit events
+- (void)setBridge:(RCTBridge *)bridge
 {
-  return @[@"TinfoilProgress"];   // one channel for all three phases
+  [super setBridge:bridge];
+
+  // hand the objects that `RCTEventEmitter` needs over to the Swift side
+  _bridge.bridge             = bridge;
+  _bridge.callableJSModules  = self.callableJSModules;
 }
 
-+ (BOOL)requiresMainQueueSetup { return NO; }
+// Forward the JS-invocation helper as soon as RN provides it  <-- NEW
+- (void)setCallableJSModules:(RCTCallableJSModules *)callableJSModules
+{
+  [super setCallableJSModules:callableJSModules];
+  _bridge.callableJSModules = callableJSModules;
+}
 
 #if RCT_NEW_ARCH_ENABLED
 - (void)initialize:(JS::NativeTinfoil::InitConfig &)config
@@ -106,18 +118,25 @@ RCT_EXPORT_METHOD(
 
 #if RCT_NEW_ARCH_ENABLED
 - (void)chatCompletionStream:(NSString *)model
-                    messages:(NSArray *)messages
-                     onOpen:(RCTResponseSenderBlock)onOpen
-                    onChunk:(RCTResponseSenderBlock)onChunk
-                     onDone:(RCTResponseSenderBlock)onDone
-                    onError:(RCTResponseSenderBlock)onError
+                     messages:(NSArray *)messages
+                      onOpen:(RCTResponseSenderBlock)onOpen
+                      onChunk:(RCTResponseSenderBlock)onChunk
+                      onDone:(RCTResponseSenderBlock)onDone
+                      onError:(RCTResponseSenderBlock)onError
 {
-  [_bridge chatCompletionStream:model
-                       messages:messages
-                         onOpen:onOpen
-                        onChunk:onChunk
-                         onDone:onDone
-                        onError:onError];
+  // JS receives progress via events, so these callback blocks are ignored.
+  [_bridge chatCompletionStream:model messages:messages];
+}
+#else
+RCT_EXPORT_METHOD(chatCompletionStream:(NSString *)model
+                       messages:(NSArray *)messages
+                       onOpen:(RCTResponseSenderBlock)onOpen
+                       onChunk:(RCTResponseSenderBlock)onChunk
+                       onDone:(RCTResponseSenderBlock)onDone
+                       onError:(RCTResponseSenderBlock)onError)
+{
+  // Same delegation for the classic bridge.
+  [_bridge chatCompletionStream:model messages:messages];
 }
 #endif
 

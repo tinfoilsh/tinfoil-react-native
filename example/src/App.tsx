@@ -6,6 +6,7 @@ import {
   Text,
   TextInput,
   View,
+  TurboModuleRegistry,
 } from 'react-native';
 import Tinfoil from 'tinfoil-react-native';
 import type {
@@ -16,6 +17,9 @@ import type {
 const API_KEY = 'YOUR_API_KEY';
 const REPO = 'tinfoilsh/confidential-llama3-3-70b';
 const ENCLAVE = 'llama3-3-70b.model.tinfoil.sh';
+
+const native = TurboModuleRegistry.get('Tinfoil');
+console.log('[debug] keys:', native ? Object.keys(native) : 'null');
 
 export default function App() {
   // Overlay on/off
