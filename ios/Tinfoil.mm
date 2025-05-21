@@ -15,6 +15,7 @@ RCT_EXPORT_MODULE(Tinfoil)
 {
   if ((self = [super init])) {
     _bridge = [TinfoilBridge new];
+    _bridge.emitter = self;
   }
   return self;
 }
@@ -25,17 +26,21 @@ RCT_EXPORT_MODULE(Tinfoil)
 - (void)setBridge:(RCTBridge *)bridge
 {
   [super setBridge:bridge];
-
-  // hand the objects that `RCTEventEmitter` needs over to the Swift side
-  _bridge.bridge             = bridge;
-  _bridge.callableJSModules  = self.callableJSModules;
 }
 
 // Forward the JS-invocation helper as soon as RN provides it  <-- NEW
 - (void)setCallableJSModules:(RCTCallableJSModules *)callableJSModules
 {
   [super setCallableJSModules:callableJSModules];
-  _bridge.callableJSModules = callableJSModules;
+}
+
+- (NSArray<NSString *> *)supportedEvents
+{
+  return @[ @"TinfoilStreamOpen",
+            @"TinfoilStreamChunk",
+            @"TinfoilStreamDone",
+            @"TinfoilStreamError",
+            @"TinfoilProgress" ];
 }
 
 #if RCT_NEW_ARCH_ENABLED

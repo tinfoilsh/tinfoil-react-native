@@ -9,23 +9,13 @@ private struct AnyModel: ModelID {
 }
 
 @objc(TinfoilBridge)           // give Obj-C something to see
-public final class TinfoilBridge: RCTEventEmitter {
+public final class TinfoilBridge: NSObject {
+
+  @objc public weak var emitter: RCTEventEmitter?
 
   private var client: TinfoilAI?
   private var currentGithubRepo: String?
   private var currentEnclaveURL: String?
-
-  /// Mandatory for RCTEventEmitter – list all event names we can send
-  @objc public override func supportedEvents() -> [String] {
-    return ["TinfoilStreamOpen",
-            "TinfoilStreamChunk",
-            "TinfoilStreamDone",
-            "TinfoilStreamError",
-            "TinfoilProgress"]
-  }
-
-  @objc public override func startObserving()  { /* nothing */ }
-  @objc public override func stopObserving()   { /* nothing */ }
 
   // MARK: – Public API exposed to Obj-C
 
@@ -113,7 +103,7 @@ public final class TinfoilBridge: RCTEventEmitter {
     messages: [[String: Any]]
   ) {
     guard let client else {
-      sendEvent(withName: "TinfoilStreamError", body: ["error": "Client not initialized"])
+      self.emitter?.sendEvent(withName: "TinfoilStreamError", body: ["error": "Client not initialized"])
       return
     }
 
@@ -134,7 +124,7 @@ public final class TinfoilBridge: RCTEventEmitter {
 
       Task.detached {
         do {
-          self.sendEvent(withName: "TinfoilStreamOpen", body: nil)
+          self.emitter?.sendEvent(withName: "TinfoilStreamOpen", body: nil)
 
           let stream = try await client.client.chats.stream(
             model: AnyModel(id: model),
@@ -143,16 +133,16 @@ public final class TinfoilBridge: RCTEventEmitter {
 
           for try await chunk in stream {
             if let delta = chunk.choices.first?.delta.content {
-              self.sendEvent(withName: "TinfoilStreamChunk", body: ["delta": delta])
+              self.emitter?.sendEvent(withName: "TinfoilStreamChunk", body: ["delta": delta])
             }
           }
-          self.sendEvent(withName: "TinfoilStreamDone", body: nil)
+          self.emitter?.sendEvent(withName: "TinfoilStreamDone", body: nil)
         } catch {
-          self.sendEvent(withName: "TinfoilStreamError", body: ["error": error.localizedDescription])
+          self.emitter?.sendEvent(withName: "TinfoilStreamError", body: ["error": error.localizedDescription])
         }
       }
     } catch {
-      self.sendEvent(withName: "TinfoilStreamError", body: ["error": error.localizedDescription])
+      self.emitter?.sendEvent(withName: "TinfoilStreamError", body: ["error": error.localizedDescription])
     }
   }
 
