@@ -21,6 +21,11 @@ const ENCLAVE = 'llama3-3-70b.model.tinfoil.sh';
 const native = TurboModuleRegistry.get('Tinfoil');
 console.log('[debug] keys:', native ? Object.keys(native) : 'null');
 
+const isClassic = !(global as any).RN$Bridgeless;
+const archLabel = isClassic
+  ? 'Old architecture (bridge)'
+  : 'New architecture (bridgeless)';
+
 export default function App() {
   // Overlay on/off
   const [show, setShow] = useState(false);
@@ -28,7 +33,7 @@ export default function App() {
   const [busy, setBusy] = useState(false);
 
   // Chat prompt / reply
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState('Hello');
   const [reply, setReply] = useState<string | null>(null);
 
   // Three progress callbacks
@@ -45,6 +50,29 @@ export default function App() {
   const initialized = useRef(false);
 
   /* ───────────────────────── Chat helper ───────────────────────── */
+  const sendPromptNonStreaming = async () => {
+    if (!prompt.trim()) return;
+    try {
+      if (!initialized.current) {
+        await Tinfoil.initialize({
+          apiKey: API_KEY,
+          githubRepo: REPO,
+          enclaveURL: ENCLAVE,
+        });
+        initialized.current = true;
+      }
+
+      setReply('…'); // placeholder
+      const text = await Tinfoil.chatCompletion('llama3-3-70b', [
+        { role: 'user', content: prompt },
+      ]);
+      setReply(text); // final reply
+    } catch (err) {
+      console.error(err);
+      setReply(String(err));
+    }
+  };
+
   const sendPrompt = async () => {
     if (!prompt.trim()) return;
     try {
@@ -125,6 +153,8 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      {/* Current React-Native architecture */}
+      <Text style={styles.arch}>Architecture: {archLabel}</Text>
       {/* ── Chat area ─────────────────────────────────────────────── */}
       <Text style={styles.heading}>Chat with the model</Text>
       <TextInput
@@ -133,7 +163,11 @@ export default function App() {
         value={prompt}
         onChangeText={setPrompt}
       />
-      <Button title="Send prompt" onPress={sendPrompt} />
+      <Button title="Send prompt (stream)" onPress={sendPrompt} />
+      <Button
+        title="Send prompt (non-stream)"
+        onPress={sendPromptNonStreaming}
+      />
       {reply !== null && <Text style={styles.reply}>Assistant: {reply}</Text>}
 
       {/* ── Verification button ─────────────────────────────────── */}
@@ -225,6 +259,11 @@ const styles = StyleSheet.create({
   },
   reply: {
     marginVertical: 8,
+  },
+  arch: {
+    alignSelf: 'center',
+    fontSize: 12,
+    color: '#666',
   },
   verifyButton: {
     marginTop: 24,

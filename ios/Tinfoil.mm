@@ -15,24 +15,11 @@ RCT_EXPORT_MODULE(Tinfoil)
 {
   if ((self = [super init])) {
     _bridge = [TinfoilBridge new];
-    _bridge.emitter = self;
   }
   return self;
 }
 
 + (BOOL)requiresMainQueueSetup { return NO; }
-
-// Forward the bridge once RN sets it so the Swift emitter can emit events
-- (void)setBridge:(RCTBridge *)bridge
-{
-  [super setBridge:bridge];
-}
-
-// Forward the JS-invocation helper as soon as RN provides it  <-- NEW
-- (void)setCallableJSModules:(RCTCallableJSModules *)callableJSModules
-{
-  [super setCallableJSModules:callableJSModules];
-}
 
 - (NSArray<NSString *> *)supportedEvents
 {

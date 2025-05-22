@@ -11,8 +11,6 @@ private struct AnyModel: ModelID {
 @objc(TinfoilBridge)           // give Obj-C something to see
 public final class TinfoilBridge: NSObject {
 
-  @objc public weak var emitter: RCTEventEmitter?
-
   private var client: TinfoilAI?
   private var currentGithubRepo: String?
   private var currentEnclaveURL: String?
