@@ -50,9 +50,9 @@ export interface Spec extends TurboModule {
   removeListeners(count: number): void;
 
   verify(
-    onCode: (s: VerificationStatus) => void,
-    onRuntime: (s: VerificationStatus) => void,
-    onSecurity: (s: VerificationStatus) => void
+    onCodeVerificationComplete: (result: VerificationStatus) => void,
+    onRuntimeVerificationComplete: (result: VerificationStatus) => void,
+    onSecurityCheckComplete: (result: VerificationStatus) => void
   ): Promise<VerificationResult>;
 }
 

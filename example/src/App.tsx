@@ -208,7 +208,8 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     gap: 12,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   heading: {
     fontSize: 18,
@@ -219,7 +220,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 4,
     padding: 8,
-    width: '100%',
+    width: '90%',
     marginBottom: 8,
   },
   reply: {
@@ -227,6 +228,7 @@ const styles = StyleSheet.create({
   },
   verifyButton: {
     marginTop: 24,
+    alignSelf: 'center',
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
