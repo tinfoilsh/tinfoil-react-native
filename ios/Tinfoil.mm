@@ -124,21 +124,13 @@ RCT_EXPORT_METHOD(
 #if RCT_NEW_ARCH_ENABLED
 - (void)chatCompletionStream:(NSString *)model
                      messages:(NSArray *)messages
-                      onOpen:(RCTResponseSenderBlock)onOpen
-                      onChunk:(RCTResponseSenderBlock)onChunk
-                      onDone:(RCTResponseSenderBlock)onDone
-                      onError:(RCTResponseSenderBlock)onError
 {
   // JS receives progress via events, so these callback blocks are ignored.
   [_bridge chatCompletionStream:model messages:messages];
 }
 #else
 RCT_EXPORT_METHOD(chatCompletionStream:(NSString *)model
-                       messages:(NSArray *)messages
-                       onOpen:(RCTResponseSenderBlock)onOpen
-                       onChunk:(RCTResponseSenderBlock)onChunk
-                       onDone:(RCTResponseSenderBlock)onDone
-                       onError:(RCTResponseSenderBlock)onError)
+                       messages:(NSArray *)messages)
 {
   // Same delegation for the classic bridge.
   [_bridge chatCompletionStream:model messages:messages];

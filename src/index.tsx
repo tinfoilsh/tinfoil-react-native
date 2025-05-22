@@ -12,15 +12,15 @@ const Tinfoil: typeof TinfoilOrig = TinfoilOrig as any;
 
 const isClassic = !(global as any).RN$Bridgeless;
 
-/* Wrap the native module so it satisfies the EventEmitter contract */
-const nativeEventModule = {
-  addListener: (event: string) =>
-    (Tinfoil as any).addListener?.(event) /* old-arch */ ?? undefined,
-  removeListeners: (n: number) =>
-    (Tinfoil as any).removeListeners?.(n) /* old-arch */ ?? undefined,
-};
+// /* Wrap the native module so it satisfies the EventEmitter contract */
+// const nativeEventModule = {
+//   addListener: (event: string) =>
+//     (Tinfoil as any).addListener?.(event) /* old-arch */ ?? undefined,
+//   removeListeners: (n: number) =>
+//     (Tinfoil as any).removeListeners?.(n) /* old-arch */ ?? undefined,
+// };
 
-const emitter = new NativeEventEmitter(nativeEventModule as any);
+const emitter = new NativeEventEmitter(Tinfoil as any);
 
 if (isClassic) {
   Tinfoil.verify = (codeCb, runtimeCb, securityCb) =>
