@@ -14,11 +14,6 @@ const isClassic = !(global as any).RN$Bridgeless;
 
 const emitter = new NativeEventEmitter(Tinfoil as any);
 
-/* Preserve the native implementation before we monkey-patch */
-const nativeChatCompletionStream = (Tinfoil as any).chatCompletionStream?.bind(
-  Tinfoil
-);
-
 if (isClassic) {
   Tinfoil.verify = (codeCb, runtimeCb, securityCb) =>
     new Promise<Tinfoil.VerificationResult>((resolve, reject) => {
@@ -51,6 +46,11 @@ if (isClassic) {
   /* ────────────────────────────────────────────
     Chat-completion streaming (event bridge)
     ──────────────────────────────────────────── */
+
+  const nativeStreamClassic = (
+    Tinfoil as any
+  ).chatCompletionStreamOldBridge?.bind(Tinfoil);
+
   Tinfoil.chatCompletionStream = (
     model: string,
     messages: Tinfoil.ChatMessage[],
@@ -75,9 +75,13 @@ if (isClassic) {
     const cleanup = () => subs.forEach((s) => s.remove());
 
     /* Kick off the native stream — no reusable callbacks cross the bridge */
-    nativeChatCompletionStream?.(model, messages);
+    nativeStreamClassic?.(model, messages);
   };
 }
+
+const nativeChatCompletionStream = (Tinfoil as any).chatCompletionStream?.bind(
+  Tinfoil
+);
 
 Tinfoil.chatCompletionStream = (
   model: string,

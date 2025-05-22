@@ -149,9 +149,22 @@ RCT_EXPORT_METHOD(
 RCT_EXPORT_METHOD(chatCompletionStreamOldBridge:(NSString *)model
                        messages:(NSArray *)messages)
 {
-  // Same delegation for the classic bridge.
-  [_bridge chatCompletionStream:model messages:messages];
-  // TODO: Add old bridge implementation
+  [_bridge chatCompletionStream:model
+                       messages:messages
+                  onOpenBridge:^{
+                    [self sendEventWithName:@"TinfoilStreamOpen" body:@{}];
+                  }
+                 onChunkBridge:^(NSString *delta){
+                    [self sendEventWithName:@"TinfoilStreamChunk"
+                                       body:@{ @"delta": delta ?: @"" }];
+                 }
+                  onDoneBridge:^{
+                    [self sendEventWithName:@"TinfoilStreamDone" body:@{}];
+                  }
+                 onErrorBridge:^(NSError *err){
+                    [self sendEventWithName:@"TinfoilStreamError"
+                                       body:@{ @"error": err.localizedDescription ?: @"" }];
+                 }];
 }
 #endif
 
