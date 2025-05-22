@@ -46,6 +46,9 @@ export interface Spec extends TurboModule {
     onError: (error: string) => void
   ): void;
 
+  addListener(eventType: string): void;
+  removeListeners(count: number): void;
+
   verify(
     onCode: (s: VerificationStatus) => void,
     onRuntime: (s: VerificationStatus) => void,

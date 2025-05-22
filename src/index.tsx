@@ -12,15 +12,12 @@ const Tinfoil: typeof TinfoilOrig = TinfoilOrig as any;
 
 const isClassic = !(global as any).RN$Bridgeless;
 
-// /* Wrap the native module so it satisfies the EventEmitter contract */
-// const nativeEventModule = {
-//   addListener: (event: string) =>
-//     (Tinfoil as any).addListener?.(event) /* old-arch */ ?? undefined,
-//   removeListeners: (n: number) =>
-//     (Tinfoil as any).removeListeners?.(n) /* old-arch */ ?? undefined,
-// };
-
 const emitter = new NativeEventEmitter(Tinfoil as any);
+
+/* Preserve the native implementation before we monkey-patch */
+const nativeChatCompletionStream = (Tinfoil as any).chatCompletionStream?.bind(
+  Tinfoil
+);
 
 if (isClassic) {
   Tinfoil.verify = (codeCb, runtimeCb, securityCb) =>
@@ -50,16 +47,38 @@ if (isClassic) {
           reject(e);
         });
     });
+
+  /* ────────────────────────────────────────────
+    Chat-completion streaming (event bridge)
+    ──────────────────────────────────────────── */
+  Tinfoil.chatCompletionStream = (
+    model: string,
+    messages: Tinfoil.ChatMessage[],
+    onOpen?: () => void,
+    onChunk?: (delta: string) => void,
+    onDone?: () => void,
+    onError?: (err: string) => void
+  ) => {
+    /* Wire native events → user-supplied callbacks */
+    const subs = [
+      emitter.addListener('TinfoilStreamOpen', () => onOpen?.()),
+      emitter.addListener('TinfoilStreamChunk', (e) => onChunk?.(e.delta)),
+      emitter.addListener('TinfoilStreamDone', () => {
+        onDone?.();
+        cleanup();
+      }),
+      emitter.addListener('TinfoilStreamError', (e) => {
+        onError?.(e.error);
+        cleanup();
+      }),
+    ];
+    const cleanup = () => subs.forEach((s) => s.remove());
+
+    /* Kick off the native stream — no reusable callbacks cross the bridge */
+    nativeChatCompletionStream?.(model, messages);
+  };
 }
 
-/* Preserve the native implementation before we monkey-patch */
-const nativeChatCompletionStream = (Tinfoil as any).chatCompletionStream?.bind(
-  Tinfoil
-);
-
-/* ────────────────────────────────────────────
-   Chat-completion streaming (event bridge)
-   ──────────────────────────────────────────── */
 Tinfoil.chatCompletionStream = (
   model: string,
   messages: Tinfoil.ChatMessage[],
@@ -69,22 +88,29 @@ Tinfoil.chatCompletionStream = (
   onError?: (err: string) => void
 ) => {
   /* Wire native events → user-supplied callbacks */
-  const subs = [
-    emitter.addListener('TinfoilStreamOpen', () => onOpen?.()),
-    emitter.addListener('TinfoilStreamChunk', (e) => onChunk?.(e.delta)),
-    emitter.addListener('TinfoilStreamDone', () => {
-      onDone?.();
-      cleanup();
-    }),
-    emitter.addListener('TinfoilStreamError', (e) => {
-      onError?.(e.error);
-      cleanup();
-    }),
-  ];
-  const cleanup = () => subs.forEach((s) => s.remove());
+  const sub = emitter.addListener('TinfoilStreamChunk', (e) =>
+    onChunk?.(e.delta)
+  );
+  const cleanup = () => sub.remove();
+
+  const wrappedDone = () => {
+    cleanup();
+    onDone?.();
+  };
+  const wrappedError = (err: string) => {
+    cleanup();
+    onError?.(err);
+  };
 
   /* Kick off the native stream — no reusable callbacks cross the bridge */
-  nativeChatCompletionStream?.(model, messages);
+  nativeChatCompletionStream?.(
+    model,
+    messages,
+    onOpen,
+    undefined,
+    wrappedDone,
+    wrappedError
+  );
 };
 
 /* ────────────────────────────────────────────

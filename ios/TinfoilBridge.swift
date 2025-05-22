@@ -97,13 +97,17 @@ public final class TinfoilBridge: NSObject {
     }
   }
 
-  @objc(chatCompletionStream:messages:)
+  @objc(chatCompletionStream:messages:onOpenBridge:onChunkBridge:onDoneBridge:onErrorBridge:)
   public func chatCompletionStream(
     _ model: String,
-    messages: [[String: Any]]
+    messages: [[String: Any]],
+    onOpenBridge: @escaping () -> Void,
+    onChunkBridge: @escaping (String) -> Void,
+    onDoneBridge: @escaping () -> Void,
+    onErrorBridge: @escaping (Error) -> Void
   ) {
     guard let client else {
-      self.emitter?.sendEvent(withName: "TinfoilStreamError", body: ["error": "Client not initialized"])
+      onErrorBridge(NSError(domain: "Tinfoil", code: 0, userInfo: [NSLocalizedDescriptionKey: "Client not initialized"]))
       return
     }
 
@@ -124,7 +128,7 @@ public final class TinfoilBridge: NSObject {
 
       Task.detached {
         do {
-          self.emitter?.sendEvent(withName: "TinfoilStreamOpen", body: nil)
+          onOpenBridge()
 
           let stream = try await client.client.chats.stream(
             model: AnyModel(id: model),
@@ -133,16 +137,16 @@ public final class TinfoilBridge: NSObject {
 
           for try await chunk in stream {
             if let delta = chunk.choices.first?.delta.content {
-              self.emitter?.sendEvent(withName: "TinfoilStreamChunk", body: ["delta": delta])
+              onChunkBridge(delta)
             }
           }
-          self.emitter?.sendEvent(withName: "TinfoilStreamDone", body: nil)
+          onDoneBridge()
         } catch {
-          self.emitter?.sendEvent(withName: "TinfoilStreamError", body: ["error": error.localizedDescription])
+          onErrorBridge(error as NSError)
         }
       }
     } catch {
-      self.emitter?.sendEvent(withName: "TinfoilStreamError", body: ["error": error.localizedDescription])
+      onErrorBridge(error as NSError)
     }
   }
 
