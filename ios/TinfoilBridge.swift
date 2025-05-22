@@ -95,6 +95,59 @@ public final class TinfoilBridge: NSObject {
     }
   }
 
+  @objc(chatCompletionStream:messages:onOpenBridge:onChunkBridge:onDoneBridge:onErrorBridge:)
+  public func chatCompletionStream(
+    _ model: String,
+    messages: [[String: Any]],
+    onOpenBridge: @escaping () -> Void,
+    onChunkBridge: @escaping (String) -> Void,
+    onDoneBridge: @escaping () -> Void,
+    onErrorBridge: @escaping (Error) -> Void
+  ) {
+    guard let client else {
+      onErrorBridge(NSError(domain: "Tinfoil", code: 0, userInfo: [NSLocalizedDescriptionKey: "Client not initialized"]))
+      return
+    }
+
+    // Convert JS messages → Swift Chat.Message
+    do {
+      let msgs: [Chat.Message] = try messages.map { dict in
+        guard let role = dict["role"] as? String,
+              let content = dict["content"] as? String
+        else { throw NSError(domain: "Tinfoil", code: 0) }
+
+        switch role {
+        case "system":    return .system(content: content)
+        case "user":      return .user(content: content)
+        case "assistant": return .assistant(content: content)
+        default: throw NSError(domain: "Tinfoil", code: 1)
+        }
+      }
+
+      Task.detached {
+        do {
+          onOpenBridge()
+
+          let stream = try await client.client.chats.stream(
+            model: AnyModel(id: model),
+            messages: msgs
+          )
+
+          for try await chunk in stream {
+            if let delta = chunk.choices.first?.delta.content {
+              onChunkBridge(delta)
+            }
+          }
+          onDoneBridge()
+        } catch {
+          onErrorBridge(error as NSError)
+        }
+      }
+    } catch {
+      onErrorBridge(error as NSError)
+    }
+  }
+
   // MARK: – Verification ------------------------------------------------------
 
   @objc

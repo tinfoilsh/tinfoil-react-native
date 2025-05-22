@@ -1,6 +1,6 @@
 #import "Tinfoil.h"
 #import <Tinfoil/Tinfoil-Swift.h> // auto-generated Swift-to-ObjC header
-
+#import <React/RCTBridge.h>
 #if RCT_NEW_ARCH_ENABLED
   #import <Tinfoil/Tinfoil.h>
 #endif
@@ -19,12 +19,16 @@ RCT_EXPORT_MODULE(Tinfoil)
   return self;
 }
 
++ (BOOL)requiresMainQueueSetup { return NO; }
+
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"TinfoilProgress"];   // one channel for all three phases
+  return @[ @"TinfoilStreamOpen",
+            @"TinfoilStreamChunk",
+            @"TinfoilStreamDone",
+            @"TinfoilStreamError",
+            @"TinfoilProgress" ];
 }
-
-+ (BOOL)requiresMainQueueSetup { return NO; }
 
 #if RCT_NEW_ARCH_ENABLED
 - (void)initialize:(JS::NativeTinfoil::InitConfig &)config
@@ -104,6 +108,52 @@ RCT_EXPORT_METHOD(
 }
 #endif   // chatCompletion
 
+#if RCT_NEW_ARCH_ENABLED
+- (void)chatCompletionStream:(NSString *)model
+                     messages:(NSArray *)messages
+                       onOpen:(RCTResponseSenderBlock)onOpen
+                       onChunk:(RCTResponseSenderBlock)onChunk
+                       onDone:(RCTResponseSenderBlock)onDone
+                      onError:(RCTResponseSenderBlock)onError
+{
+  [_bridge chatCompletionStream:model
+                       messages:messages
+                          onOpenBridge:^{
+                            onOpen(@[]);            // ← fire
+                          }
+                          onChunkBridge:^(NSString *delta){
+                          [self sendEventWithName:@"TinfoilStreamChunk"
+                                         body:@{@"delta": delta}];
+                        }
+                        onDoneBridge:^{
+                            onDone(@[]);
+                        }
+                        onErrorBridge:^(NSError *err){
+                            onError(@[err.localizedDescription]);
+                        }];
+}
+#else
+RCT_EXPORT_METHOD(chatCompletionStreamOldBridge:(NSString *)model
+                       messages:(NSArray *)messages)
+{
+  [_bridge chatCompletionStream:model
+                       messages:messages
+                  onOpenBridge:^{
+                    [self sendEventWithName:@"TinfoilStreamOpen" body:@{}];
+                  }
+                 onChunkBridge:^(NSString *delta){
+                    [self sendEventWithName:@"TinfoilStreamChunk"
+                                       body:@{ @"delta": delta ?: @"" }];
+                 }
+                  onDoneBridge:^{
+                    [self sendEventWithName:@"TinfoilStreamDone" body:@{}];
+                  }
+                 onErrorBridge:^(NSError *err){
+                    [self sendEventWithName:@"TinfoilStreamError"
+                                       body:@{ @"error": err.localizedDescription ?: @"" }];
+                 }];
+}
+#endif
 
 // ────────────────────────────────────────────────────────────────
 // VERIFY

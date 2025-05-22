@@ -31,8 +31,18 @@ If you're developing the library itself:
 ```sh
 npm install
 ```
+Then simply run
+```sh
+cd ..  # go back to example directory
+npx react-native run-ios
+```
 
-If you're developing the library itself and want to build the example app:
+Note: Make sure you have CocoaPods installed (`sudo gem install cocoapods`).
+
+### Compilation with Xcode
+Compiling with Xcode can be useful to access the debugger and other functionalities.
+
+First launch the react native server
 ```sh
 npm run start --workspace=tinfoil-react-native-example
 ```
@@ -41,17 +51,11 @@ Then in a separate terminal:
 ```sh
 cd example/ios && pod install  # in the example app's ios folder
 ```
-Then to build and run the app use
+Then to build and run the app use, open the workspace in Xcode
 ```sh
 open ReactNativeExample.xcworkspace
 ```
-Or
-```sh
-cd ..  # go back to example directory
-npx react-native run-ios
-```
-
-Note: Make sure you have CocoaPods installed (`sudo gem install cocoapods`).
+And use the Xcode interface to build and run your app.
 
 ---
 

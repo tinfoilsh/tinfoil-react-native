@@ -6,6 +6,7 @@ import {
   Text,
   TextInput,
   View,
+  TurboModuleRegistry,
 } from 'react-native';
 import Tinfoil from 'tinfoil-react-native';
 import type {
@@ -17,6 +18,14 @@ const API_KEY = 'YOUR_API_KEY';
 const REPO = 'tinfoilsh/confidential-llama3-3-70b';
 const ENCLAVE = 'llama3-3-70b.model.tinfoil.sh';
 
+const native = TurboModuleRegistry.get('Tinfoil');
+console.log('[debug] keys:', native ? Object.keys(native) : 'null');
+
+const isClassic = !(global as any).RN$Bridgeless;
+const archLabel = isClassic
+  ? 'Old architecture (bridge)'
+  : 'New architecture (bridgeless)';
+
 export default function App() {
   // Overlay on/off
   const [show, setShow] = useState(false);
@@ -24,7 +33,7 @@ export default function App() {
   const [busy, setBusy] = useState(false);
 
   // Chat prompt / reply
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState('Hello');
   const [reply, setReply] = useState<string | null>(null);
 
   // Three progress callbacks
@@ -41,6 +50,29 @@ export default function App() {
   const initialized = useRef(false);
 
   /* ───────────────────────── Chat helper ───────────────────────── */
+  const sendPromptNonStreaming = async () => {
+    if (!prompt.trim()) return;
+    try {
+      if (!initialized.current) {
+        await Tinfoil.initialize({
+          apiKey: API_KEY,
+          githubRepo: REPO,
+          enclaveURL: ENCLAVE,
+        });
+        initialized.current = true;
+      }
+
+      setReply('…'); // placeholder
+      const text = await Tinfoil.chatCompletion('llama3-3-70b', [
+        { role: 'user', content: prompt },
+      ]);
+      setReply(text); // final reply
+    } catch (err) {
+      console.error(err);
+      setReply(String(err));
+    }
+  };
+
   const sendPrompt = async () => {
     if (!prompt.trim()) return;
     try {
@@ -53,11 +85,30 @@ export default function App() {
         initialized.current = true;
       }
 
-      setReply('…'); // placeholder while waiting
-      const text = await Tinfoil.chatCompletion('llama3-3-70b', [
-        { role: 'user', content: prompt },
-      ]);
-      setReply(text);
+      setReply(''); // Start with empty reply for streaming
+
+      // Use streaming API instead of regular completion
+      Tinfoil.chatCompletionStream(
+        'llama3-3-70b',
+        [{ role: 'user', content: prompt }],
+        () => {
+          // onOpen - stream connection established
+          // No action needed here, or could show "Streaming..."
+        },
+        (delta) => {
+          // onChunk - append each chunk to the reply
+          setReply((prev) => (prev || '') + delta);
+        },
+        () => {
+          // onDone - stream completed successfully
+          // No action needed here, all text is already in the reply
+        },
+        (error) => {
+          // onError - handle streaming errors
+          console.error(error);
+          setReply(`Error: ${error}`);
+        }
+      );
     } catch (err) {
       console.error(err);
       setReply(String(err));
@@ -102,6 +153,8 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      {/* Current React-Native architecture */}
+      <Text style={styles.arch}>Architecture: {archLabel}</Text>
       {/* ── Chat area ─────────────────────────────────────────────── */}
       <Text style={styles.heading}>Chat with the model</Text>
       <TextInput
@@ -110,7 +163,11 @@ export default function App() {
         value={prompt}
         onChangeText={setPrompt}
       />
-      <Button title="Send prompt" onPress={sendPrompt} />
+      <Button title="Send prompt (stream)" onPress={sendPrompt} />
+      <Button
+        title="Send prompt (non-stream)"
+        onPress={sendPromptNonStreaming}
+      />
       {reply !== null && <Text style={styles.reply}>Assistant: {reply}</Text>}
 
       {/* ── Verification button ─────────────────────────────────── */}
@@ -185,7 +242,8 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     gap: 12,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   heading: {
     fontSize: 18,
@@ -196,14 +254,20 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 4,
     padding: 8,
-    width: '100%',
+    width: '90%',
     marginBottom: 8,
   },
   reply: {
     marginVertical: 8,
   },
+  arch: {
+    alignSelf: 'center',
+    fontSize: 12,
+    color: '#666',
+  },
   verifyButton: {
     marginTop: 24,
+    alignSelf: 'center',
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
